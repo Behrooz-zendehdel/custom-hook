@@ -1,6 +1,5 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer } from "react";
 import axios from "axios";
-import { act } from "react-dom/test-utils";
 
 const initialState = {
   error: null,
