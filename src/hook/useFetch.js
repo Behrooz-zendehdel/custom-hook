@@ -1,26 +1,49 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import axios from "axios";
+import { act } from "react-dom/test-utils";
+
+const initialState = {
+  error: null,
+  data: null,
+  loading: false,
+};
+const actions = {
+  fetchRequest: "FETCH_DATA_REQUEST",
+  fetchSuccess: "FETCH_DATA_SUCCESS",
+  fetchFailure: "FETCH_DATA_FAILURE",
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case actions.fetchRequest: {
+      return { ...state, loading: true, error: null, data: null };
+    }
+    case actions.fetchSuccess: {
+      return { ...state, loading: false, error: null, data: action.payload };
+    }
+    case actions.fetchFailure: {
+      return { ...state, loading: false, error: action.payload, data: null };
+    }
+    default:
+      return state;
+  }
+}
 
 const useFetch = (url) => {
-  const [error, setError] = useState(null);
-  const [loading, setLoding] = useState(false);
-  const [data, setdata] = useState(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    setLoding(true);
-    setdata(null);
-    setError(null);
+    dispatch({ type: actions.fetchRequest });
+
     axios
       .get("https://jsonplaceholder.typicode.com/users")
       .then((res) => {
-        setLoding(false);
-        setdata(res.data);
+        dispatch({ type: actions.fetchSuccess, payload: res.data });
       })
       .catch((err) => {
-        setLoding(false);
-        setError(err.message);
+        dispatch({ type: actions.fetchFailure, payload: err.message });
       });
   }, [url]);
-  return { loading, error, data };
+  return state;
 };
 export default useFetch;
