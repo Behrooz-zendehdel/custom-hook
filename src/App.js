@@ -1,35 +1,18 @@
 import "./App.css";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import useFetch from "./hook/useFetch";
 
 function App() {
-  const [error, setError] = useState(null);
-  const [loading, setLoding] = useState(false);
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    setLoding(true);
-    setUser(null);
-    setError(null);
-    axios
-      .get("https://jsonplaceholder.typicode.com/users")
-      .then((res) => {
-        setLoding(false);
-        setUser(res.data);
-      })
-      .catch((err) => {
-        setLoding(false);
-        setError(err.message);
-      });
-  }, []);
+  const { loading, error, data } = useFetch(
+    "https://jsonplaceholder.typicode.com/users"
+  );
 
   return (
     <div className="App">
       {loading && <p>loading ....</p>}
       {error && <p>{error}</p>}
-      {user && (
+      {data && (
         <div>
-          {user.map((user) => (
+          {data.map((user) => (
             <li>{user.name}</li>
           ))}
         </div>
